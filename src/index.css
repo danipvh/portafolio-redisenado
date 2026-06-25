@@ -85,6 +85,13 @@
     outline: none;
     box-shadow: none;
   }
+
+  .text-gradient {
+    color: #d946ef;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 /* Custom scrollbar */

@@ -59,7 +59,7 @@ export default function Hero() {
               </span>
             ))}
             <span className="inline-block">&nbsp;</span>
-            <span className="text-[#d946ef] bg-gradient-to-r from-[#e879f9] via-[#c084fc] to-[#a855f7] bg-clip-text text-transparent">
+            <span className="text-gradient bg-gradient-to-r from-[#e879f9] via-[#c084fc] to-[#a855f7] bg-clip-text">
               {"crecer digitalmente.".split(" ").map((word, wordIdx, arr) => (
                 <span key={`w2-${wordIdx}`} className="inline-block whitespace-nowrap">
                   {word.split("").map((char, charIdx) => (
