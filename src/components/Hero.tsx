@@ -1,10 +1,26 @@
 import { CheckCircle2 } from 'lucide-react';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 
 const InteractiveCodeBg = lazy(() => import('./InteractiveCodeBg'));
 
 export default function Hero() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(query.matches);
+    update();
+
+    if ('addEventListener' in query) {
+      query.addEventListener('change', update);
+      return () => query.removeEventListener('change', update);
+    }
+
+    query.addListener(update);
+    return () => query.removeListener(update);
+  }, []);
+
   const checkmarks = [
     'Desarrollo Web a Medida',
     'Soluciones Personalizadas',
@@ -59,26 +75,32 @@ export default function Hero() {
               </span>
             ))}
             <span className="inline-block">&nbsp;</span>
-            <span className="text-gradient bg-gradient-to-r from-[#e879f9] via-[#c084fc] to-[#a855f7] bg-clip-text">
-              {"crecer digitalmente.".split(" ").map((word, wordIdx, arr) => (
-                <span key={`w2-${wordIdx}`} className="inline-block whitespace-nowrap">
-                  {word.split("").map((char, charIdx) => (
-                    <motion.span 
-                      key={`c2-${charIdx}`} 
-                      variants={{
-                        hidden: { opacity: 0, y: 8 },
-                        visible: { opacity: 1, y: 0 }
-                      }} 
-                      transition={{ duration: 0.35, ease: "easeOut" }}
-                      className="inline-block"
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-                  {wordIdx < arr.length - 1 && <span className="inline-block">&nbsp;</span>}
-                </span>
-              ))}
-            </span>
+            {isMobile ? (
+              <span className="inline-block text-[#d946ef]">
+                crecer digitalmente.
+              </span>
+            ) : (
+              <span className="text-gradient bg-gradient-to-r from-[#e879f9] via-[#c084fc] to-[#a855f7] bg-clip-text">
+                {"crecer digitalmente.".split(" ").map((word, wordIdx, arr) => (
+                  <span key={`w2-${wordIdx}`} className="inline-block whitespace-nowrap">
+                    {word.split("").map((char, charIdx) => (
+                      <motion.span 
+                        key={`c2-${charIdx}`} 
+                        variants={{
+                          hidden: { opacity: 0, y: 8 },
+                          visible: { opacity: 1, y: 0 }
+                        }} 
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="inline-block"
+                      >
+                        {char}
+                      </motion.span>
+                    ))}
+                    {wordIdx < arr.length - 1 && <span className="inline-block">&nbsp;</span>}
+                  </span>
+                ))}
+              </span>
+            )}
           </motion.h1>
 
           <motion.p 
