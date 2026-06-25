@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-export default function PurpleWaveCanvas() {
+interface PurpleWaveCanvasProps {
+  isMobile?: boolean;
+}
+
+export default function PurpleWaveCanvas({ isMobile = false }: PurpleWaveCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -24,33 +28,31 @@ export default function PurpleWaveCanvas() {
     let step = 0;
 
     const render = () => {
-      step += 0.015;
+      step += isMobile ? 0.01 : 0.015;
 
-      // Clear canvas cleanly each frame
       ctx.clearRect(0, 0, width, height);
 
       const centerY = height / 2;
-      const numWaves = 18;
-
-      // Base dimension scaling so canvas doesn't overload mobile devices
+      const numWaves = isMobile ? 10 : 18;
       const minDim = Math.min(width, height);
-      const responsiveAmplitude = minDim * 0.18;
-      const baseFreq = (Math.PI * 2.2) / width;
+      const responsiveAmplitude = minDim * (isMobile ? 0.12 : 0.18);
+      const baseFreq = (Math.PI * (isMobile ? 2.0 : 2.2)) / width;
+      const xStep = isMobile ? 14 : 8;
 
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
 
       for (let i = 0; i < numWaves; i++) {
         ctx.beginPath();
-        
+
         const norm = i / numWaves;
-        const freq = baseFreq + (i % 5) * (baseFreq * 0.13);
+        const freq = baseFreq + (i % 5) * (baseFreq * 0.12);
         const phase = step * (0.65 + (i % 4) * 0.2) + (i * Math.PI) / 18;
         const maxAmplitude = responsiveAmplitude * Math.sin(norm * Math.PI);
 
         let color: string;
         let alpha = 0.04 + Math.sin(norm * Math.PI) * 0.12;
-        
+
         if (i % 4 === 0) {
           color = `rgba(0, 241, 255, ${alpha})`;
         } else if (i % 4 === 1) {
@@ -62,10 +64,10 @@ export default function PurpleWaveCanvas() {
         }
 
         ctx.strokeStyle = color;
-        ctx.lineWidth = 1 + (i % 2) * 0.35;
+        ctx.lineWidth = isMobile ? 1 : 1 + (i % 2) * 0.35;
         ctx.shadowColor = 'transparent';
 
-        for (let x = 0; x <= width; x += 8) {
+        for (let x = 0; x <= width; x += xStep) {
           const xRatio = x / width;
           const envelope = Math.sin(xRatio * Math.PI);
           const yOffset = Math.sin(x * freq + phase) * Math.cos(x * (baseFreq * 0.4) - phase * 0.28) * maxAmplitude * Math.pow(envelope, 1.25);
@@ -78,13 +80,17 @@ export default function PurpleWaveCanvas() {
             ctx.lineTo(x, y);
           }
         }
+
         ctx.stroke();
       }
 
-      // Soft ambient luminous water green core (very subtle opacity)
       const coreGradient = ctx.createRadialGradient(
-        width / 2, centerY + Math.sin(step * 1.2) * 6, 0,
-        width / 2, centerY + Math.sin(step * 1.2) * 6, minDim * 0.35
+        width / 2,
+        centerY + Math.sin(step * 1.2) * 6,
+        0,
+        width / 2,
+        centerY + Math.sin(step * 1.2) * 6,
+        minDim * 0.35
       );
       coreGradient.addColorStop(0, 'rgba(204, 251, 241, 0.15)');
       coreGradient.addColorStop(0.3, 'rgba(0, 241, 255, 0.08)');
@@ -105,7 +111,7 @@ export default function PurpleWaveCanvas() {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <canvas
